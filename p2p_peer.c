@@ -454,10 +454,26 @@ static void ensure_storage_ready(PeerContext *ctx) {
     }
 }
 
+static void current_timestamp(char *buf, size_t cap) {
+    struct timespec ts;
+    if (clock_gettime(CLOCK_REALTIME, &ts) != 0) {
+        snprintf(buf, cap, "0000-00-00 00:00:00.000");
+        return;
+    }
+    struct tm tm;
+    localtime_r(&ts.tv_sec, &tm);
+    int ms = (int)(ts.tv_nsec / 1000000);
+    snprintf(buf, cap, "%04d-%02d-%02d %02d:%02d:%02d.%03d",
+             tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+             tm.tm_hour, tm.tm_min, tm.tm_sec, ms);
+}
+
 static void log_line(const PeerContext *ctx, const char *fmt, ...) {
+    char timebuf[64];
+    current_timestamp(timebuf, sizeof(timebuf));
     va_list args;
     va_start(args, fmt);
-    fprintf(stdout, "[%s:%u] ", ctx->listen_host, ctx->listen_port);
+    fprintf(stdout, "[%s] [%s:%u] ", timebuf, ctx->listen_host, ctx->listen_port);
     vfprintf(stdout, fmt, args);
     fprintf(stdout, "\n");
     fflush(stdout);
@@ -655,6 +671,11 @@ static bool queue_block_data(PeerContext *ctx, Connection *conn, uint32_t block_
     }
 
     bool ok = queue_message(conn, MSG_BLOCK_DATA, block_index, buffer, (uint32_t)payload_len);
+    if (ok) {
+        log_line(ctx, "queued block %u (%zu bytes) to %s", block_index, payload_len, conn->remote_name[0] ? conn->remote_name : "peer");
+    } else {
+        log_line(ctx, "failed to queue block %u to %s", block_index, conn->remote_name[0] ? conn->remote_name : "peer");
+    }
     free(buffer);
     return ok;
 }

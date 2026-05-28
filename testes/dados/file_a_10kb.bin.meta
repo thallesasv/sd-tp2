@@ -1,0 +1,5 @@
+filename=file_a_10kb.bin
+filesize=10240
+block_size=1024
+block_count=10
+sha256=88b30d83165889a5b674cee3b9ea07aa4a55f306d7ced74964add9698a376608
