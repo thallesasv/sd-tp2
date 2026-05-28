@@ -1,13 +1,12 @@
 # TP2 - Transferencia de Arquivos Peer-to-Peer
 
-Esta pasta concentra a implementacao do Trabalho Pratico 2 em C, os scripts de teste e um rascunho de relatorio alinhado ao enunciado convertido do PDF.
+Esta pasta concentra a implementacao do Trabalho Pratico 2 em C e os scripts de teste.
 
 ## Estrutura
 
 - [p2p_peer.c](p2p_peer.c): peer unico que atua como servidor e cliente ao mesmo tempo.
 - [Makefile](Makefile): compilacao do executavel principal.
 - [README.md](README.md): instrucoes de uso.
-- [relatorio_tp2.md](relatorio_tp2.md): rascunho do relatorio do TP2.
 - [testes/](testes/): scripts para gerar arquivos e executar cenarios.
 
 ## Visao geral da implementacao
