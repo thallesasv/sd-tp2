@@ -64,8 +64,30 @@ Use os scripts em [testes/](testes/) para gerar os arquivos de entrada e reprodu
 
 O arquivo [testes/README.md](testes/README.md) explica como criar os arquivos A, B e C, como rodar uma demo local com 2 ou 4 peers e como salvar logs para o relatorio.
 
+### Runner de testes (Linux)
+
+Um runner shell `testes/run_local.sh` foi adicionado para facilitar execucoes locais (2 ou 4 peers). Exemplos:
+
+```bash
+bash testes/run_local.sh 2   # 1 seeder + 1 leecher
+bash testes/run_local.sh 4   # 1 seeder + 3 leechers
+```
+
+Os logs gerados ficam em `testes/logs`. Copias das execucoes usadas nas analises estao em `testes/logs_run_2` e `testes/logs_run_4`.
+
 ## Observacoes
 
 - O leecher pode iniciar com `--meta` ou esperar o metadado de um vizinho.
 - O programa permanece ativo apos concluir o download para continuar servindo blocos.
 - Use `--stop-on-complete` apenas em demonstracoes curtas.
+
+## Instrumentacao e notas de depuracao
+
+- Os logs agora incluem timestamps (`YYYY-MM-DD HH:MM:SS.mmm`) para permitir calculo de duracoes entre eventos.
+- Foi adicionada uma mensagem de log em `queue_block_data` quando um bloco e enfileirado: `queued block <i> (<bytes>) to <peer>` — isso permite contar blocos enfileirados pelo seeder.
+- Para medir bytes efetivamente enviados por conexao, pode‑se adicionar logging em `flush_connection` (opcional).
+
+## Avisos e recomendacoes
+
+- Compilador pode emitir avisos sobre possivel truncamento em `snprintf` em alguns caminhos largos; estes avisos nao afetaram os testes, mas recomenda‑se revisar e aplicar checagens de tamanho (ou `strlcpy`/`asprintf` onde apropriado) para maior robustez.
+- Os resultados atuais foram obtidos em ambiente localhost com arquivos pequenos; para avaliar escalabilidade real execute testes com `--block-size=4096` e arquivos maiores (1 MB, 5 MB, 10 MB) e/ou simule latencia com `tc/netem`.
